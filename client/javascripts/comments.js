@@ -1,35 +1,39 @@
 //jshint esversion: 6
 
 let controller = function() {
+  //load comments from db when page loads
+  //if (localStorage.getItem("commentsList")) {
+  //  $(".comments").html(localStorage.getItem("commentsList"));
+  //}
 
   $.ajax({
-    url: "http://localhost:8888/todos",
+    url: "http://localhost:8888/comments",
     method: "GET"
   }).done((res) => {
     let pElem;
     //console.log(res.comments[0]._id + " " + res.comments[0].data)
-    res.todos.forEach((todo) => {
-      pElem = $("<p>").html(todo.data)
+    res.comments.forEach((comment) => {
+      pElem = $("<p>").html(comment.data)
       $(".comments").append(pElem);
     })
   });
 
   let addCommentFromInputBox = function() {
     //Semmy uses "$" to name variables that will contain jQuery objects
-    let $new_todo, content;
+    let $new_comment, content;
 
     if ($(".comment-input input").val() !== "") {
       content = $(".comment-input input").val();
-      $new_todo = $("<p>").text(content);
-      //$new_todo.hide();
-      $(".comments").append($new_todo);
-      //$new_todo.fadeIn();
+      $new_comment = $("<p>").text(content);
+      //$new_comment.hide();
+      $(".comments").append($new_comment);
+      //$new_comment.fadeIn();
       $(".comment-input input").val("");
 
       //add comment to db
       $.ajax({
           method: "POST",
-          url: "http://localhost:8888/addtodo",
+          url: "http://localhost:8888/addcomment",
           data: {
             data: content
           }
@@ -41,7 +45,6 @@ let controller = function() {
   };
 
   $(".comment-input button").on("click", function(event) {
-    console.log($(".comment-input button").attr("id"));
     addCommentFromInputBox();
   });
 
@@ -52,29 +55,29 @@ let controller = function() {
   });
 };
 
-let deleteTodo = () => {
+let deleteComment = () => {
   //delete a comment from db
   let content = $("#deleteOne").val();
   $.ajax({
       method: "POST",
-      url: "http://localhost:8888/deletetodo/" + content
+      url: "http://localhost:8888/deletecomment/" + content
     })
     .done(function(msg) {
-      console.log("Todo deleted: " + msg);
+      console.log("Comment deleted: " + msg);
     });
 
   window.location.reload();
 }
 
-let getToDo = () => {
+let getComment = () => {
   //clear outDiv
   $("#outDiv").html("");
   let pElem;
-  //retrieve a todo from db
+  //retrieve a comment from db
   let content = $("#getOne").val();
   $.ajax({
       method: "GET",
-      url: "http://localhost:8888/gettodo/" + content
+      url: "http://localhost:8888/getcomment/" + content
     })
     .done(function(msg) {
       console.log("Comment retrieved: " + msg.message.data);
@@ -98,8 +101,8 @@ $(document).ready(() => {
   btn03 = document.querySelectorAll('button')[3];
   btn03.addEventListener('click', deleteAll);
   btn02 = document.querySelectorAll('button')[2];
-  btn02.addEventListener('click', deleteTodo);
+  btn02.addEventListener('click', deleteComment);
   btn01 = document.querySelectorAll('button')[1];
-  btn01.addEventListener('click', getToDo);
+  btn01.addEventListener('click', getComment);
   controller();
 });
